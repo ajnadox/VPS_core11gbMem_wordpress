@@ -11,4 +11,4 @@ All suggestions are welcome / André - Nadox // aj@nadox.se
 Quick Setup:
 Login to the Ubuntu Server 14.04.1 LTS VPS you have created, then just run:
 
-wget https://raw.githubusercontent.com/ajnadox/VPS_core11gbMem_wordpress/master/VPS_LEMP_ndx.sh && sudo chmod a+x VPS_LEMP_ndx.sh && sudo ./VPS_LEMP_ndx.sh
+wget https://raw.githubusercontent.com/ajnadox/VPS_core11gbMem_wordpress/master/VPS_LEMP_ndx.sh && sudo chmod +x VPS_LEMP_ndx.sh && sudo ./VPS_LEMP_ndx.sh
