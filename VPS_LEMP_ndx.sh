@@ -6,17 +6,17 @@ clear
 echo -e "Your IPv4 & IPv6 addresses on server:"
 ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
 echo 
-echo -e "Please type the password you like to have for MySQL Root account: \c "
+echo -e "Please type the password you want for MySQL Root account: \c "
 read MYSQLROOTPASS
-echo -e "Please type the MySQL database name that will be created (example: wordpress): \c "
+echo -e "Please type the MySQL database name that shall be created (example: wordpress): \c "
 read MYSQLDATABASE
-echo -e "Please type your webserver address (domainname.123 or IP): \c "
+echo -e "Please type your webserver address (domainname.123 or IP, look at the top of this side): \c "
 read SERVERNAMEORIP
-echo -e "Please type the MySQL username you like: \c "
+echo -e "Please type the MySQL username you want to create: \c "
 read MYSQLDATABASEUSER
-echo -e "Please type MySQL password that you like to have: \c "
+echo -e "Please type the MySQL password that user shall have: \c "
 read MYSQLUSERPASS
-sudo apt-get update
+sudo apt-get update && sudo apt-get dist-upgrade -y && sudo apt-get autoremove && sudo apt-get autoclean
 sudo apt-get install -y nginx
 echo "mysql-server mysql-server/root_password password $MYSQLROOTPASS" | sudo debconf-set-selections
 echo "mysql-server mysql-server/root_password_again password $MYSQLROOTPASS" | sudo debconf-set-selections
@@ -35,7 +35,7 @@ sudo ln -s /usr/share/secu-phpmyadmin /usr/share/nginx/wordpress
 sudo php5enmod mcrypt
 sudo service php5-fpm restart
 
-sudo printf "add_header X-Cache $upstream_cache_status;\n" > /etc/nginx/sites-available/wp-ms
+sudo printf 'add_header X-Cache $upstream_cache_status;\n' > /etc/nginx/sites-available/wp-ms
 sudo printf "server {\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    listen [::]:80 ipv6only=off;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    server_name "$SERVERNAMEORIP" *."$SERVERNAMEORIP" ;\n" >> /etc/nginx/sites-available/wp-ms
@@ -44,7 +44,7 @@ sudo printf "    root /usr/share/nginx/wordpress;\n" >> /etc/nginx/sites-availab
 sudo printf "    index index.php index.html index.htm;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    location / {\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "        try_files $$uri $$uri/ /index.php?$$args ;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf '        try_files $uri $uri/ /index.php?$args ;\n' >> /etc/nginx/sites-available/wp-ms
 sudo printf "    }\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    location ~ /favicon.ico {\n" >> /etc/nginx/sites-available/wp-ms
@@ -53,21 +53,21 @@ sudo printf "        log_not_found off;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "   }\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    location ~ \.php$ {\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		try_files $uri =404;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_split_path_info ^(.+\.php)(/.+)$;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_cache microcache;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_cache_key $scheme$host$request_uri$request_method;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_cache_valid 200 301 302 30s;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_cache_use_stale updating error timeout invalid_header http_500;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_pass_header Set-Cookie;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_pass_header Cookie;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_ignore_headers Cache-Control Expires Set-Cookie;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_pass unix:/var/run/php5-fpm.sock;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		fastcgi_index index.php;\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "		include fastcgi_params;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf '        try_files $uri =404;\n' >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_split_path_info ^(.+\.php)(/.+)$;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_cache microcache;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf '        fastcgi_cache_key $scheme$host$request_uri$request_method;\n' >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_cache_valid 200 301 302 30s;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_cache_use_stale updating error timeout invalid_header http_500;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_pass_header Set-Cookie;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_pass_header Cookie;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_ignore_headers Cache-Control Expires Set-Cookie;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_pass unix:/var/run/php5-fpm.sock;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        fastcgi_index index.php;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf "        include fastcgi_params;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    }\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "\n" >> /etc/nginx/sites-available/wp-ms
-sudo printf "    access_log  /var/log/nginx/$$host-access.log;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf '    access_log  /var/log/nginx/$host-access.log;\n' >> /etc/nginx/sites-available/wp-ms
 sudo printf "    error_log   /var/log/nginx/wpms-error.log;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "}\n" >> /etc/nginx/sites-available/wp-ms
 
@@ -110,7 +110,7 @@ echo -e "Access phpMyAdmin @ http://$SERVERNAMEORIP/secu-phpmyadmin"
 echo -e "with User: $MYSQLDATABASEUSER and Password: $MYSQLUSERPASS"
 echo -e "Your MySQL root password is: $MYSQLROOTPASS"
 echo -e "............................."
-read -p "Press [Enter] key to start updateing & cleaning of temp files..."
-sudo apt-get update && sudo apt-get dist-upgrade -y && sudo apt-get autoremove && sudo apt-get autoclean
+read -p "Press [Enter] key to start updating & cleaning of temp files..."
 sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
+sudo apt-get autoremove && sudo apt-get autoclean
 sudo rm -rf VPS_LEMP_ndx.sh
