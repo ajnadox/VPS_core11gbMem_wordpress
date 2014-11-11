@@ -54,7 +54,7 @@ sudo printf "   }\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf "    location ~ \.php$ {\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf '        try_files $uri =404;\n' >> /etc/nginx/sites-available/wp-ms
-sudo printf "        fastcgi_split_path_info ^(.+\.php)(/.+)$;\n" >> /etc/nginx/sites-available/wp-ms
+sudo printf '        fastcgi_split_path_info ^(.+\.php)(/.+)$;\n' >> /etc/nginx/sites-available/wp-ms
 sudo printf "        fastcgi_cache microcache;\n" >> /etc/nginx/sites-available/wp-ms
 sudo printf '        fastcgi_cache_key $scheme$host$request_uri$request_method;\n' >> /etc/nginx/sites-available/wp-ms
 sudo printf "        fastcgi_cache_valid 200 301 302 30s;\n" >> /etc/nginx/sites-available/wp-ms
@@ -93,6 +93,8 @@ sed -i "s/^;listen.group = www-data/listen.group = www-data/" /etc/php5/fpm/pool
 sed -i "s/^;listen.mode = 0660/listen.mode = 0660/" /etc/php5/fpm/pool.d/www.conf
 mkdir /usr/share/nginx/cache
 sed -i "s/^\tworker_connections 768;/\tworker_connections 1536;/" /etc/nginx/nginx.conf
+sed -i "s/^\t#passenger_ruby \/usr\/bin\/ruby;/\t#passenger_ruby \/usr\/bin\/ruby;\n\n\tfastcgi_cache_path \/usr\/share\/nginx\/cache\/fcgi levels=1:2 keys_zone=microcache:10m max_size=1024m inactive=1h;/" /etc/nginx/nginx.conf
+sed -i "s/^\taccess_log \/var\/log\/nginx\/access.log;/\taccess_log off;\n\t#access_log \/var\/log\/nginx\/access.log;/" /etc/nginx/nginx.conf
 
 sudo service nginx restart
 sudo service mysql restart
@@ -110,7 +112,8 @@ echo -e "Access phpMyAdmin @ http://$SERVERNAMEORIP/secu-phpmyadmin"
 echo -e "with User: $MYSQLDATABASEUSER and Password: $MYSQLUSERPASS"
 echo -e "Your MySQL root password is: $MYSQLROOTPASS"
 echo -e "............................."
-read -p "Press [Enter] key to start updating & cleaning of temp files..."
-sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
+read -p "Press [Enter] key to start updating & cleaning of temp files and then reboot..."
+#sudo dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
 sudo apt-get autoremove && sudo apt-get autoclean
 sudo rm -rf VPS_LEMP_ndx.sh
+sudo reboot
